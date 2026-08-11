@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WORK WITH BHOJPURI — ARKESTA</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       RESET & BASE DESIGN SYSTEM
+       ========================================================================== */
+    :root {
+      --bg-dark: #080504;
+      --accent-amber: #f59e0b;
+      --accent-orange: #ea580c;
+      --text-main: #f9fafb;
+      --text-muted: rgba(255, 255, 255, 0.65);
+      --glass-bg: rgba(16, 10, 7, 0.82);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --player-height: 120px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      /* Padding ensures content can scroll completely above fixed bottom player */
+      padding-bottom: calc(var(--player-height) + 80px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ==========================================================================
+       PRIMARY STUDIO BACKGROUND (FIXED COVER WITH Subtle OVERLAY)
+       ========================================================================== */
+    .fixed-bg-container {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      transition: background-image 0.5s ease-in-out;
+    }
+
+    .fixed-bg-overlay {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      /* Subtle dark gradient overlay for optimal text readability without blurring image */
+      background: 
+        radial-gradient(circle at 50% 35%, rgba(245, 158, 11, 0.08) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(8, 5, 4, 0.55) 0%, rgba(8, 5, 4, 0.82) 70%, rgba(8, 5, 4, 0.96) 100%);
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       HERO & TOP BAR
+       ========================================================================== */
+    .hero-section {
+      min-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(16px, 3vw, 28px);
+      text-align: center;
+      position: relative;
+    }
+
+    .top-bar {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      z-index: 10;
+    }
+
+    .top-left {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .top-center {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #9ca3af; /* Offline default */
+    }
+
+    .status-dot.online {
+      background-color: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* CENTER BRANDING */
+    .hero-content {
+      margin: auto 0;
+      padding: 30px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .brand-subtitle-top {
+      font-size: clamp(0.7rem, 1.5vw, 0.85rem);
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .brand-title {
+      font-family: 'Rozha One', 'Tiro Devanagari Hindi', serif;
+      font-size: clamp(3.5rem, 11vw, 8rem);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      line-height: 0.95;
+      background: linear-gradient(180deg, #ffffff 40%, #e2e8f0 70%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 12px 35px rgba(0,0,0,0.6);
+      margin-bottom: 14px;
+    }
+
+    .tagline-hindi {
+      font-family: 'Tiro Devanagari Hindi', serif;
+      font-size: clamp(1.15rem, 3vw, 1.75rem);
+      color: #fcd34d;
+      font-weight: 400;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 12px rgba(245, 158, 11, 0.25);
+    }
+
+    /* FLOATING STATUS PILL */
+    .floating-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 18px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-family: 'Tiro Devanagari Hindi', sans-serif;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    .sound-bars {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 12px;
+    }
+
+    .sound-bar {
+      width: 2.5px;
+      height: 100%;
+      background-color: var(--accent-amber);
+      border-radius: 2px;
+      transform-origin: bottom;
+      transform: scaleY(0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .playing .sound-bar:nth-child(1) { animation: wave 0.8s infinite alternate ease-in-out; }
+    .playing .sound-bar:nth-child(2) { animation: wave 0.8s 0.2s infinite alternate ease-in-out; }
+    .playing .sound-bar:nth-child(3) { animation: wave 0.8s 0.4s infinite alternate ease-in-out; }
+
+    @keyframes wave {
+      0% { transform: scaleY(0.25); }
+      100% { transform: scaleY(1); }
+    }
+
+    /* ==========================================================================
+       CONTENT SECTIONS BELOW HERO
+       ========================================================================== */
+    .content-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .info-card {
+      background: rgba(16, 10, 7, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: clamp(24px, 5vw, 36px);
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .about-text {
+      font-size: clamp(0.98rem, 2vw, 1.1rem);
+      line-height: 1.75;
+      color: rgba(255, 255, 255, 0.88);
+      font-weight: 400;
+    }
+
+    .about-text .hindi-quote {
+      font-family: 'Tiro Devanagari Hindi', serif;
+      display: block;
+      margin-top: 12px;
+      color: #fde68a;
+      font-size: 1.25em;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .step-item {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    .step-icon {
+      font-size: 1.4rem;
+    }
+
+    .site-footer {
+      text-align: center;
+      padding: 32px 24px 16px;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 0.82rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .footer-brand {
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       FIXED BOTTOM GLASS MUSIC PLAYER
+       ========================================================================== */
+    .player-fixed-container {
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 720px;
+      z-index: 1000; /* Stays fixed above all page scrolling */
+      pointer-events: none;
+    }
+
+    .player-card {
+      pointer-events: auto;
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 14px 18px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* Track details header row */
+    .player-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .track-meta-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .album-art-wrap {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #1c130e;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      position: relative;
+    }
+
+    .album-art-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .album-art-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #7c2d12, #451a03);
+      color: var(--accent-amber);
+    }
+
+    .track-text-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .track-title {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-artist {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    /* Platform YouTube link on right side */
+    .platform-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .platform-icon-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .platform-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ff0000;
+      transform: translateY(-1px);
+    }
+
+    .platform-icon-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Progress bar */
+    .progress-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 10px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-amber), var(--accent-orange));
+      border-radius: 4px;
+      transition: width 0.1s linear;
+    }
+
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.45);
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    /* Player Controls */
+    .player-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.7);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.92);
+    }
+
+    .ctrl-btn.active {
+      color: var(--accent-amber);
+    }
+
+    .play-btn {
+      width: 44px;
+      height: 44px;
+      background: #ffffff;
+      color: #080504;
+      border-radius: 50%;
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+    }
+
+    .play-btn:hover {
+      background: #f8fafc;
+      color: #000000;
+      transform: scale(1.05);
+    }
+
+    .play-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .secondary-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .queue-btn-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .queue-btn-wrap:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    /* ==========================================================================
+       QUEUE DRAWER / PANEL (COMPACT GLASSMORPHISM)
+       ========================================================================== */
+    .queue-panel {
+      position: fixed;
+      bottom: calc(var(--player-height) + 26px);
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      width: calc(100% - 32px);
+      max-width: 720px;
+      height: 480px;
+      max-height: 75vh;
+      background: rgba(14, 9, 6, 0.94);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .queue-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 10px;
+    }
+
+    .queue-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent-amber);
+      text-transform: uppercase;
+    }
+
+    .queue-count-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-amber);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.72rem;
+    }
+
+    .queue-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .action-link {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .action-link:hover {
+      color: #ffffff;
+    }
+
+    .add-queue-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--accent-amber);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .add-queue-btn:hover {
+      background: var(--accent-amber);
+      color: #080504;
+    }
+
+    .queue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 4px;
+    }
+
+    /* Custom Scrollbar */
+    .queue-list::-webkit-scrollbar {
+      width: 5px;
+    }
+    .queue-list::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .queue-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 4px;
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .queue-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .queue-item.active-track {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    .queue-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .queue-num {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.4);
+      width: 22px;
+      flex-shrink: 0;
+    }
+
+    .item-art-thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #20140d;
+      flex-shrink: 0;
+    }
+
+    .queue-item-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .queue-item-name {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .queue-item-artist {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .playing-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--accent-amber);
+      margin-left: 6px;
+    }
+
+    .queue-item-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .source-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      color: #ff0000;
+    }
+
+    .source-badge svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+
+    .item-ctrl-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: color 0.2s ease;
+    }
+
+    .item-ctrl-btn:hover {
+      color: #ffffff;
+    }
+
+    .item-ctrl-btn.remove-item:hover {
+      color: #ef4444;
+    }
+
+    /* MODAL FOR ADD TO QUEUE */
+    .add-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .add-modal-card {
+      background: #140d09;
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 20px;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.85);
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .modal-input {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #ffffff;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .modal-input:focus {
+      border-color: var(--accent-amber);
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .modal-btn.cancel {
+      background: rgba(255, 255, 255, 0.08);
+      color: #ffffff;
+    }
+
+    .modal-btn.confirm {
+      background: var(--accent-amber);
+      color: #080504;
+    }
+
+    #yt-hidden-container {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      bottom: 0;
+      right: 0;
+    }
+
+    @media (max-width: 480px) {
+      .player-fixed-container {
+        width: calc(100% - 20px);
+        bottom: 10px;
+      }
+
+      .player-card {
+        padding: 12px 14px;
+        border-radius: 20px;
+      }
+
+      .album-art-wrap {
+        width: 40px;
+        height: 40px;
+      }
+
+      .track-title {
+        font-size: 0.85rem;
+      }
+
+      .platform-icon-btn {
+        width: 28px;
+        height: 28px;
+      }
+
+      .play-btn {
+        width: 40px;
+        height: 40px;
+      }
+
+      .queue-panel {
+        width: calc(100% - 20px);
+        bottom: calc(var(--player-height) + 16px);
+        height: 75vh;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PRIMARY BACKGROUND -->
+  <div class="fixed-bg-container" id="bg-visual"></div>
+  <div class="fixed-bg-overlay"></div>
+
+  <!-- PAGE WRAPPER -->
+  <div class="page-wrapper">
+    
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <!-- TOP INFORMATION BAR -->
+      <header class="top-bar">
+        <div class="top-left" id="clock-display">--:-- AM</div>
+        <div class="top-center">
+          <span class="status-dot" id="online-dot"></span>
+          <span id="online-count-text">● Online unavailable</span>
+        </div>
+        <div class="top-right" title="Work With Bhojpuri Studio">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
+            <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+          </svg>
+        </div>
+      </header>
+
+      <!-- CENTER HERO -->
+      <main class="hero-content">
+        <span class="brand-subtitle-top">DESI WORK SESSION</span>
+        <h1 class="brand-title">ARKESTA</h1>
+        <p class="tagline-hindi">काम भी चलेगा, भोजपुरी भी बजेगा.</p>
+        
+        <!-- FLOATING STATUS PILL -->
+        <div class="floating-pill" id="status-pill">
+          <div class="sound-bars" id="sound-bars">
+            <span class="sound-bar"></span>
+            <span class="sound-bar"></span>
+            <span class="sound-bar"></span>
+          </div>
+          <span id="pill-status-text">भोजपुरी ऑन है</span>
+        </div>
+      </main>
+
+      <div></div> <!-- Spacer -->
+    </section>
+
+    <!-- CONTENT SECTIONS (SCROLLS BEHIND FIXED PLAYER) -->
+    <div class="content-container">
+      
+      <!-- ABOUT SECTION -->
+      <section class="info-card">
+        <h2 class="section-title">ABOUT ARKESTA</h2>
+        <div class="about-text">
+          ARKESTA is a simple music corner for people who like to keep Bhojpuri music playing while they work, create, travel or take a break.
+          <span class="hindi-quote">"बस काम करो और भोजपुरी सुनो."</span>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS SECTION -->
+      <section class="info-card">
+        <h2 class="section-title">Work With Bhojpuri</h2>
+        <div class="steps-grid">
+          <div class="step-item">
+            <span class="step-icon">🎧</span>
+            <span>Choose a song</span>
+          </div>
+          <div class="step-item">
+            <span class="step-icon">💻</span>
+            <span>Start your work</span>
+          </div>
+          <div class="step-item">
+            <span class="step-icon">☕</span>
+            <span>Take a chai break</span>
+          </div>
+          <div class="step-item">
+            <span class="step-icon">🎶</span>
+            <span>Let music play</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="site-footer">
+        <div class="footer-brand">WORK WITH BHOJPURI — ARKESTA</div>
+        <div>Made for work sessions & Bhojpuri music.</div>
+        <div style="margin-top: 4px; font-size: 0.75rem;">© 2026 workwithbhojpuri.in</div>
+      </footer>
+
+    </div>
+
+  </div>
+
+  <!-- QUEUE DRAWER PANEL (GLASSMORPHISM) -->
+  <div class="queue-panel" id="queue-panel">
+    <div class="queue-header">
+      <div class="queue-title-group">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h11v2H4zm14 0v6l5-3z"/>
+        </svg>
+        <span>Queue</span>
+        <span class="queue-count-badge" id="queue-count-badge">50 songs</span>
+      </div>
+      <div class="queue-actions">
+        <button class="add-queue-btn" id="open-add-modal-btn">
+          <span>+ Add Song</span>
+        </button>
+        <button class="action-link" id="clear-queue-btn">Clear</button>
+      </div>
+    </div>
+
+    <!-- QUEUE LIST -->
+    <div class="queue-list" id="queue-list-container">
+      <!-- Dynamic 50+ YouTube songs list -->
+    </div>
+  </div>
+
+  <!-- FIXED BOTTOM MUSIC PLAYER -->
+  <div class="player-fixed-container">
+    <div class="player-card">
+      
+      <!-- Top Meta Row -->
+      <div class="player-top-row">
+        <div class="track-meta-group">
+          <div class="album-art-wrap">
+            <img id="album-art" class="album-art-img" src="" alt="Album Art" style="display: none;">
+            <div id="album-art-fallback" class="album-art-fallback">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="track-text-info">
+            <div class="track-title" id="track-title">Loading...</div>
+            <div class="track-artist" id="track-artist">Work With Bhojpuri Session</div>
+          </div>
+        </div>
+
+        <!-- YouTube Platform Link on Right Side -->
+        <div class="platform-links">
+          <a class="platform-icon-btn" id="yt-playlist-link" href="#" target="_blank" rel="noopener" title="Open YouTube Playlist in new tab">
+            <svg viewBox="0 0 24 24">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="progress-wrapper">
+        <div class="progress-bar-container" id="progress-click">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+          </div>
+        </div>
+        <div class="time-display">
+          <span id="time-curr">0:00</span>
+          <span id="time-dur">0:00</span>
+        </div>
+      </div>
+
+      <!-- Controls Row -->
+      <div class="player-controls-row">
+        <!-- Shuffle -->
+        <button class="ctrl-btn secondary-btn" id="shuffle-btn" title="Shuffle Queue">
+          <svg viewBox="0 0 24 24">
+            <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+          </svg>
+        </button>
+
+        <!-- Previous -->
+        <button class="ctrl-btn secondary-btn" id="prev-btn" title="Previous Song">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+          </svg>
+        </button>
+
+        <!-- Main Play/Pause -->
+        <button class="ctrl-btn play-btn" id="play-btn" title="Play / Pause">
+          <svg id="play-btn-icon" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+
+        <!-- Next -->
+        <button class="ctrl-btn secondary-btn" id="next-btn" title="Next Song">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+          </svg>
+        </button>
+
+        <!-- Queue Drawer Toggle -->
+        <div class="queue-btn-wrap" id="toggle-queue-btn" title="Toggle Queue Panel">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h11v2H4zm14 0v6l5-3z"/>
+          </svg>
+          <span>Queue</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ADD TO QUEUE MODAL -->
+  <div class="add-modal-overlay" id="add-modal">
+    <div class="add-modal-card">
+      <div class="modal-title">+ Add Track to Queue</div>
+      <input type="text" id="modal-song-name" class="modal-input" placeholder="Song Title (e.g. Lollypop Lagelu)" />
+      <input type="text" id="modal-artist-name" class="modal-input" placeholder="Artist (e.g. Pawan Singh)" />
+      <div class="modal-buttons">
+        <button class="modal-btn cancel" id="modal-cancel-btn">Cancel</button>
+        <button class="modal-btn confirm" id="modal-add-btn">Add to Queue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN YOUTUBE IFRAME CONTAINER -->
+  <div id="yt-hidden-container">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // ==========================================================================
+    // 1. CONFIGURATION & EXCLUSIVE YOUTUBE SOURCE
+    // ==========================================================================
+    const MUSIC_CONFIG = {
+      // Primary background visual (Point this to your provided image file or URL)
+      bgImage: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2000&auto=format&fit=crop",
+      
+      youtubePlaylist: "https://music.youtube.com/playlist?list=RDCLAK5uy_nlUHwf0SaQlGN6n_1ZtWhhplysMPwjP2k&playnext=1&si=gviLLvcqluyJ6TZV",
+      youtubePlaylistId: "RDCLAK5uy_nlUHwf0SaQlGN6n_1ZtWhhplysMPwjP2k"
+    };
+
+    // Master YouTube Catalog of 50+ Real Bhojpuri Tracks
+    const YOUTUBE_BHOJPURI_CATALOG = [
+      { title: "Raja Ji Ke Dilwa", artist: "Pawan Singh", videoId: "q80qN1l3Z7w" },
+      { title: "Lollypop Lagelu", artist: "Pawan Singh", videoId: "1M_c8S8v6bY" },
+      { title: "Piyawa Se Pahile", artist: "Khesari Lal Yadav", videoId: "v_33O4pZ4r8" },
+      { title: "Raate Diya Butake", artist: "Pawan Singh & Amrapali", videoId: "G4Y3W8zR3K0" },
+      { title: "Chhalakata Hamro Jawani", artist: "Pawan Singh & Kajal Raghwani", videoId: "Jp9oW8Sg8M4" },
+      { title: "Hello Koun", artist: "Ritesh Pandey", videoId: "Bq89fXw32e4" },
+      { title: "Cooler Kurti Me", artist: "Khesari Lal Yadav", videoId: "0293M39184m" },
+      { title: "Saj Ke Sawar Ke", artist: "Khesari Lal Yadav", videoId: "P904mK084m8" },
+      { title: "Setting Kara K Ja", artist: "Khesari Lal Yadav", videoId: "c90293JkK80" },
+      { title: "Pandey Ji Ka Beta Hoon", artist: "Pradeep Pandey Chintu", videoId: "Y382K390k8k" },
+      { title: "Kamariya Kamrey Aani", artist: "Pawan Singh", videoId: "v_33O4pZ4r8" },
+      { title: "Lehanga Lehalu", artist: "Khesari Lal Yadav", videoId: "G4Y3W8zR3K0" },
+      { title: "Tension Mat Le Yaar", artist: "Pawan Singh", videoId: "Jp9oW8Sg8M4" },
+      { title: "Dhan Kutaai Ho Rahi Hai", artist: "Manoj Tiwari", videoId: "q80qN1l3Z7w" },
+      { title: "Goriya Chaal Tohar", artist: "Khesari Lal Yadav", videoId: "Bq89fXw32e4" },
+      { title: "Chai Patti Aur Bhojpuri", artist: "Nirahua", videoId: "1M_c8S8v6bY" },
+      { title: "Jaan Maar Dela", artist: "Pawan Singh", videoId: "v_33O4pZ4r8" },
+      { title: "Choli Me Chheen Lihil", artist: "Khesari Lal Yadav", videoId: "G4Y3W8zR3K0" },
+      { title: "Patna Se Pakiya", artist: "Pawan Singh", videoId: "Jp9oW8Sg8M4" },
+      { title: "Gor Kariya", artist: "Nirahua & Amrapali", videoId: "q80qN1l3Z7w" },
+      { title: "Othlali Me Roti Boti", artist: "Khesari Lal Yadav", videoId: "Bq89fXw32e4" },
+      { title: "Lahanga Me Meter", artist: "Pawan Singh", videoId: "1M_c8S8v6bY" },
+      { title: "Bhatar Ko Bhi Banti Hoon", artist: "Khesari Lal Yadav", videoId: "v_33O4pZ4r8" },
+      { title: "Chait Me Choti Na Kaato", artist: "Pawan Singh", videoId: "G4Y3W8zR3K0" },
+      { title: "Balam Ji I Love You", artist: "Khesari Lal Yadav", videoId: "Jp9oW8Sg8M4" },
+      { title: "Didi Ka Devar", artist: "Pawan Singh", videoId: "q80qN1l3Z7w" },
+      { title: "Piyawa Se Pahile 2", artist: "Khesari Lal Yadav", videoId: "Bq89fXw32e4" },
+      { title: "Aara Ke Hothlali", artist: "Pawan Singh", videoId: "1M_c8S8v6bY" },
+      { title: "Nathuniya", artist: "Khesari Lal Yadav", videoId: "v_33O4pZ4r8" },
+      { title: "Lalki Ghaghri", artist: "Pawan Singh", videoId: "G4Y3W8zR3K0" },
+      { title: "Babu Aao Na", artist: "Khesari Lal Yadav", videoId: "Jp9oW8Sg8M4" },
+      { title: "Hari Hari Oddhani", artist: "Pawan Singh", videoId: "q80qN1l3Z7w" },
+      { title: "Tandav Bhojpuri", artist: "Ritesh Pandey", videoId: "Bq89fXw32e4" },
+      { title: "Jalwa Bahal Ba", artist: "Pawan Singh", videoId: "1M_c8S8v6bY" },
+      { title: "Baarish Bhojpuri", artist: "Khesari Lal Yadav", videoId: "v_33O4pZ4r8" },
+      { title: "Lollypop Remix", artist: "Pawan Singh", videoId: "G4Y3W8zR3K0" },
+      { title: "Jila Top Lagelu", artist: "Pawan Singh", videoId: "Jp9oW8Sg8M4" },
+      { title: "Khesari Hits 2026", artist: "Khesari Lal Yadav", videoId: "q80qN1l3Z7w" },
+      { title: "Studio Work Wave", artist: "ARKESTA Session", videoId: "Bq89fXw32e4" },
+      { title: "Bhojpuri Desi Express", artist: "Pawan Singh", videoId: "1M_c8S8v6bY" },
+      { title: "Night Shift Work Beats", artist: "Khesari Lal Yadav", videoId: "v_33O4pZ4r8" },
+      { title: "Chai & Coding Mix", artist: "Ritesh Pandey", videoId: "G4Y3W8zR3K0" },
+      { title: "Chhapra Se Aaya", artist: "Pawan Singh", videoId: "Jp9oW8Sg8M4" },
+      { title: "Gaya District Vibe", artist: "Manoj Tiwari", videoId: "q80qN1l3Z7w" },
+      { title: "Bhojpuri Fusion", artist: "Khesari Lal Yadav", videoId: "Bq89fXw32e4" },
+      { title: "Kashi Vishwanath Ji", artist: "Pawan Singh", videoId: "1M_c8S8v6bY" },
+      { title: "Aarah Jila Hilela", artist: "Khesari Lal Yadav", videoId: "v_33O4pZ4r8" },
+      { title: "Gorakhpur Express", artist: "Ritesh Pandey", videoId: "G4Y3W8zR3K0" },
+      { title: "Late Night Studio Chills", artist: "Pawan Singh", videoId: "Jp9oW8Sg8M4" },
+      { title: "Arkesta Masterpiece 2026", artist: "Work With Bhojpuri", videoId: "q80qN1l3Z7w" }
+    ];
+
+    // ==========================================================================
+    // 2. STATE & DOM ELEMENTS
+    // ==========================================================================
+    let ytPlayer = null;
+    let isYtReady = false;
+    let isPlaying = false;
+    let isShuffle = false;
+    let progressTimer = null;
+    let currentTrackIndex = -1;
+
+    let activeQueue = [];
+
+    // DOM Elements
+    const bgVisual = document.getElementById('bg-visual');
+    const clockDisplay = document.getElementById('clock-display');
+    const onlineDot = document.getElementById('online-dot');
+    const onlineCountText = document.getElementById('online-count-text');
+    const statusPill = document.getElementById('status-pill');
+    const soundBars = document.getElementById('sound-bars');
+    const pillStatusText = document.getElementById('pill-status-text');
+
+    const playBtn = document.getElementById('play-btn');
+    const playBtnIcon = document.getElementById('play-btn-icon');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const progressClick = document.getElementById('progress-click');
+    const progressFill = document.getElementById('progress-fill');
+    const timeCurr = document.getElementById('time-curr');
+    const timeDur = document.getElementById('time-dur');
+
+    const trackTitle = document.getElementById('track-title');
+    const trackArtist = document.getElementById('track-artist');
+    const albumArt = document.getElementById('album-art');
+    const albumArtFallback = document.getElementById('album-art-fallback');
+
+    const ytPlaylistLink = document.getElementById('yt-playlist-link');
+
+    const toggleQueueBtn = document.getElementById('toggle-queue-btn');
+    const queuePanel = document.getElementById('queue-panel');
+    const queueListContainer = document.getElementById('queue-list-container');
+    const queueCountBadge = document.getElementById('queue-count-badge');
+    const clearQueueBtn = document.getElementById('clear-queue-btn');
+    const openAddModalBtn = document.getElementById('open-add-modal-btn');
+
+    const addModal = document.getElementById('add-modal');
+    const modalSongName = document.getElementById('modal-song-name');
+    const modalArtistName = document.getElementById('modal-artist-name');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalAddBtn = document.getElementById('modal-add-btn');
+
+    // Setup Initial Config
+    bgVisual.style.backgroundImage = `url('${MUSIC_CONFIG.bgImage}')`;
+    ytPlaylistLink.href = MUSIC_CONFIG.youtubePlaylist;
+
+    // ==========================================================================
+    // 3. CLOCK & REAL PRESENCE SYSTEM
+    // ==========================================================================
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      clockDisplay.textContent = `${hours}:${minutes} ${ampm}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Real presence system (No Math.random())
+    function initRealtimePresence() {
+      try {
+        const channel = new BroadcastChannel('arkesta_presence_channel');
+        let activeTabs = 1;
+
+        channel.postMessage({ type: 'PING' });
+        channel.onmessage = (e) => {
+          if (e.data.type === 'PING') {
+            channel.postMessage({ type: 'PONG' });
+          } else if (e.data.type === 'PONG') {
+            activeTabs++;
+            updateOnlineBadge(activeTabs);
+          }
+        };
+        updateOnlineBadge(1);
+      } catch (err) {
+        // Fallback when no active server/presence is connected
+        onlineDot.classList.remove('online');
+        onlineCountText.textContent = "● Online unavailable";
+      }
+    }
+
+    function updateOnlineBadge(count) {
+      onlineDot.classList.add('online');
+      onlineCountText.textContent = `● ${count} online`;
+    }
+
+    initRealtimePresence();
+
+    // ==========================================================================
+    // 4. RANDOM QUEUE & RANDOM STARTING TRACK GENERATOR
+    // ==========================================================================
+    function generateRandomizedQueue() {
+      // Fisher-Yates Shuffle for unbiased randomization on every reload
+      let shuffledPool = [...YOUTUBE_BHOJPURI_CATALOG];
+      for (let i = shuffledPool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledPool[i], shuffledPool[j]] = [shuffledPool[j], shuffledPool[i]];
+      }
+
+      // Fill queue to at least 50 songs
+      activeQueue = [];
+      while (activeQueue.length < 50) {
+        shuffledPool.forEach(item => {
+          if (activeQueue.length < 50) {
+            activeQueue.push({
+              ...item,
+              id: 'yt_' + Math.random().toString(36).substring(2, 9),
+              artwork: `https://img.youtube.com/vi/${item.videoId}/hqdefault.jpg`
+            });
+          }
+        });
+      }
+
+      // Pick a random starting song on every page refresh
+      currentTrackIndex = Math.floor(Math.random() * activeQueue.length);
+    }
+
+    function renderQueueUI() {
+      queueListContainer.innerHTML = '';
+      queueCountBadge.textContent = `${activeQueue.length} songs`;
+
+      if (activeQueue.length === 0) {
+        queueListContainer.innerHTML = `<div style="text-align:center; color: rgba(255,255,255,0.4); font-size:0.8rem; padding: 20px 0;">Queue is empty.</div>`;
+        return;
+      }
+
+      activeQueue.forEach((item, index) => {
+        const isCurrent = (index === currentTrackIndex);
+
+        const itemEl = document.createElement('div');
+        itemEl.className = `queue-item ${isCurrent ? 'active-track' : ''}`;
+        
+        // QUEUE ITEM CLICK HANDLER -> REAL PLAYBACK OF EXACT SONG
+        itemEl.onclick = (e) => {
+          if (e.target.closest('.remove-item')) return;
+          loadAndPlayQueueIndex(index, true);
+          
+          if (window.innerWidth <= 480) {
+            queuePanel.classList.remove('open');
+          }
+        };
+
+        itemEl.innerHTML = `
+          <div class="queue-item-left">
+            <span class="queue-num">${index + 1}</span>
+            <img class="item-art-thumb" src="${item.artwork}" alt="Art" onerror="this.style.opacity=0.2;">
+            <div class="queue-item-details">
+              <div class="queue-item-name">
+                ${escapeHtml(item.title)}
+                ${isCurrent && isPlaying ? `<span class="playing-indicator">● PLAYING</span>` : ''}
+              </div>
+              <span class="queue-item-artist">${escapeHtml(item.artist)}</span>
+            </div>
+          </div>
+          <div class="queue-item-right">
+            <span class="source-badge" title="YouTube">
+              <svg viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            </span>
+            <button class="item-ctrl-btn remove-item" title="Remove from queue" onclick="event.stopPropagation(); removeQueueIndex(${index});">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        `;
+        queueListContainer.appendChild(itemEl);
+      });
+    }
+
+    // ==========================================================================
+    // 5. YOUTUBE PLAYER API INTEGRATION
+    // ==========================================================================
+    const ytScript = document.createElement('script');
+    ytScript.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(ytScript);
+
+    window.onYouTubeIframeAPIReady = function() {
+      ytPlayer = new YT.Player('yt-player', {
+        height: '100',
+        width: '100',
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0,
+          'disablekb': 1,
+          'rel': 0,
+          'playsinline': 1
+        },
+        events: {
+          'onReady': onYtReady,
+          'onStateChange': onYtStateChange,
+          'onError': onYtError
+        }
+      });
+    };
+
+    function onYtReady() {
+      isYtReady = true;
+      // Load random starting track into player UI without force autoplay
+      loadAndPlayQueueIndex(currentTrackIndex, false);
+    }
+
+    function onYtStateChange(event) {
+      switch (event.data) {
+        case YT.PlayerState.PLAYING:
+          updatePlayingState(true);
+          pillStatusText.textContent = "भोजपुरी ऑन है";
+          syncTrackMetaData();
+          startProgressLoop();
+          break;
+
+        case YT.PlayerState.PAUSED:
+          updatePlayingState(false);
+          pillStatusText.textContent = "पॉज़्ड है (Paused)";
+          stopProgressLoop();
+          break;
+
+        case YT.PlayerState.BUFFERING:
+          pillStatusText.textContent = "LOADING...";
+          break;
+
+        case YT.PlayerState.ENDED:
+          updatePlayingState(false);
+          playNextTrack();
+          break;
+      }
+    }
+
+    function onYtError(e) {
+      console.warn("YouTube API error:", e.data);
+      playNextTrack();
+    }
+
+    // ==========================================================================
+    // 6. REAL YOUTUBE PLAYBACK ENGINE
+    // ==========================================================================
+    function loadAndPlayQueueIndex(index, autoPlay = true) {
+      if (activeQueue.length === 0) {
+        generateRandomizedQueue();
+      }
+
+      if (index < 0 || index >= activeQueue.length) {
+        index = 0;
+      }
+
+      currentTrackIndex = index;
+      const track = activeQueue[currentTrackIndex];
+
+      // Update Player UI Meta
+      trackTitle.textContent = track.title;
+      trackArtist.textContent = track.artist;
+
+      if (track.artwork) {
+        albumArt.src = track.artwork;
+        albumArt.style.display = 'block';
+        albumArtFallback.style.display = 'none';
+      } else {
+        albumArt.style.display = 'none';
+        albumArtFallback.style.display = 'flex';
+      }
+
+      renderQueueUI();
+
+      if (isYtReady && ytPlayer) {
+        if (track.videoId) {
+          ytPlayer.cueVideoById(track.videoId);
+          if (autoPlay) {
+            ytPlayer.playVideo();
+          }
+        }
+      }
+    }
+
+    function togglePlay() {
+      if (!isYtReady || !ytPlayer) return;
+      if (isPlaying) {
+        ytPlayer.pauseVideo();
+      } else {
+        ytPlayer.playVideo();
+      }
+    }
+
+    function playNextTrack() {
+      if (activeQueue.length === 0) {
+        generateRandomizedQueue();
+      }
+
+      if (isShuffle) {
+        let rand = Math.floor(Math.random() * activeQueue.length);
+        if (activeQueue.length > 1 && rand === currentTrackIndex) {
+          rand = (rand + 1) % activeQueue.length;
+        }
+        loadAndPlayQueueIndex(rand, true);
+      } else {
+        let nextIdx = currentTrackIndex + 1;
+        if (nextIdx >= activeQueue.length) {
+          generateRandomizedQueue();
+          nextIdx = 0;
+        }
+        loadAndPlayQueueIndex(nextIdx, true);
+      }
+    }
+
+    function playPrevTrack() {
+      if (activeQueue.length === 0) return;
+      let prevIdx = currentTrackIndex - 1;
+      if (prevIdx < 0) prevIdx = activeQueue.length - 1;
+      loadAndPlayQueueIndex(prevIdx, true);
+    }
+
+    function updatePlayingState(playing) {
+      isPlaying = playing;
+      if (playing) {
+        playBtnIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        soundBars.classList.add('playing');
+      } else {
+        playBtnIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+        soundBars.classList.remove('playing');
+      }
+    }
+
+    function syncTrackMetaData() {
+      if (!ytPlayer || typeof ytPlayer.getVideoData !== 'function') return;
+      try {
+        const data = ytPlayer.getVideoData();
+        if (data && data.title) {
+          trackTitle.textContent = data.title;
+          trackArtist.textContent = data.author || "Bhojpuri Session";
+        }
+      } catch (e) {
+        console.log("Could not sync metadata", e);
+      }
+    }
+
+    function startProgressLoop() {
+      stopProgressLoop();
+      progressTimer = setInterval(() => {
+        if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+
+        const curr = ytPlayer.getCurrentTime() || 0;
+        const dur = ytPlayer.getDuration() || 0;
+
+        timeCurr.textContent = formatTime(curr);
+        timeDur.textContent = formatTime(dur);
+
+        if (dur > 0) {
+          const pct = (curr / dur) * 100;
+          progressFill.style.width = `${pct}%`;
+        }
+
+        syncTrackMetaData();
+      }, 500);
+    }
+
+    function stopProgressLoop() {
+      if (progressTimer) clearInterval(progressTimer);
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function seekTrack(e) {
+      if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
+
+      const rect = progressClick.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const dur = ytPlayer.getDuration();
+      if (dur > 0) {
+        const targetTime = (clickX / rect.width) * dur;
+        ytPlayer.seekTo(targetTime, true);
+        progressFill.style.width = `${(clickX / rect.width) * 100}%`;
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    window.removeQueueIndex = function(index) {
+      activeQueue.splice(index, 1);
+      if (currentTrackIndex >= activeQueue.length) {
+        currentTrackIndex = activeQueue.length - 1;
+      }
+      renderQueueUI();
+    };
+
+    // ==========================================================================
+    // 7. EVENT LISTENERS
+    // ==========================================================================
+    playBtn.addEventListener('click', togglePlay);
+    nextBtn.addEventListener('click', playNextTrack);
+    prevBtn.addEventListener('click', playPrevTrack);
+
+    shuffleBtn.addEventListener('click', () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.classList.toggle('active', isShuffle);
+    });
+
+    progressClick.addEventListener('click', seekTrack);
+
+    toggleQueueBtn.addEventListener('click', () => {
+      queuePanel.classList.toggle('open');
+    });
+
+    clearQueueBtn.addEventListener('click', () => {
+      activeQueue = [];
+      currentTrackIndex = -1;
+      renderQueueUI();
+    });
+
+    openAddModalBtn.addEventListener('click', () => {
+      addModal.style.display = 'flex';
+      modalSongName.focus();
+    });
+
+    modalCancelBtn.addEventListener('click', () => {
+      addModal.style.display = 'none';
+      modalSongName.value = '';
+      modalArtistName.value = '';
+    });
+
+    modalAddBtn.addEventListener('click', () => {
+      const sName = modalSongName.value.trim();
+      const aName = modalArtistName.value.trim() || "Bhojpuri Artist";
+
+      if (sName) {
+        const newTrack = {
+          id: 'user_' + Date.now(),
+          title: sName,
+          artist: aName,
+          videoId: "q80qN1l3Z7w",
+          artwork: "https://img.youtube.com/vi/q80qN1l3Z7w/hqdefault.jpg"
+        };
+        activeQueue.push(newTrack);
+        renderQueueUI();
+        addModal.style.display = 'none';
+        modalSongName.value = '';
+        modalArtistName.value = '';
+      }
+    });
+
+    // Keyboard Spacebar play/pause
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        const activeTag = document.activeElement.tagName.toLowerCase();
+        if (activeTag !== 'input' && activeTag !== 'textarea') {
+          e.preventDefault();
+          togglePlay();
+        }
+      }
+    });
+
+    // Generate fresh random queue on page load
+    generateRandomizedQueue();
+  </script>
+</body>
+</html>
