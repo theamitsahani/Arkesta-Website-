@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ARKESTA — Desi Work Session</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Tiro+Devanagari+Hindi&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       RESET & BASE STYLES
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background-color: #0b0705;
+      color: #f3f4f6;
+    }
+
+    /* ==========================================================================
+       CINEMATIC BACKGROUND
+       ========================================================================== */
+    .bg-container {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background-image: 
+        radial-gradient(circle at center, rgba(234, 88, 12, 0.15) 0%, rgba(11, 7, 5, 0.85) 75%),
+        linear-gradient(180deg, rgba(15, 9, 6, 0.65) 0%, rgba(11, 7, 5, 0.92) 100%),
+        url('https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?q=80&w=2000&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      transform: scale(1.02);
+      transition: transform 12s ease-out;
+    }
+
+    /* Subtle atmospheric vignette overlay */
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(5, 3, 2, 0.85) 100%);
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       MAIN VIEWPORT LAYOUT
+       ========================================================================== */
+    .app-viewport {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: clamp(16px, 3vw, 28px);
+      padding-bottom: calc(clamp(16px, 3vw, 28px) + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* ==========================================================================
+       TOP BAR
+       ========================================================================== */
+    .top-bar {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.65);
+      z-index: 20;
+    }
+
+    .top-left {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .top-center {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .live-dot {
+      color: #ef4444;
+      font-size: 0.7rem;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .top-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    /* ==========================================================================
+       CENTER HERO CONTENT
+       ========================================================================== */
+    .hero-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin: auto 0;
+      padding: 20px 0;
+      z-index: 20;
+    }
+
+    .brand-title {
+      font-family: 'Rozha One', 'Tiro Devanagari Hindi', serif;
+      font-size: clamp(3.2rem, 10vw, 7.5rem);
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      background: linear-gradient(180deg, #ffffff 30%, #f1f5f9 60%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      margin-bottom: 8px;
+    }
+
+    .tagline-hindi {
+      font-family: 'Tiro Devanagari Hindi', serif;
+      font-size: clamp(1.05rem, 2.8vw, 1.6rem);
+      color: #f59e0b;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      margin-bottom: 6px;
+      text-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+    }
+
+    .sub-tagline {
+      font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      color: rgba(255, 255, 255, 0.45);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    /* Floating Status Pill */
+    .floating-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font-family: 'Tiro Devanagari Hindi', sans-serif;
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .audio-wave-icon {
+      display: inline-flex;
+      align-items: flex-end;
+      gap: 2px;
+      height: 12px;
+    }
+
+    .audio-wave-bar {
+      width: 2px;
+      height: 100%;
+      background-color: #f59e0b;
+      border-radius: 1px;
+      transform-origin: bottom;
+    }
+
+    .playing .bar-1 { animation: soundWave 0.8s ease-in-out infinite alternate; }
+    .playing .bar-2 { animation: soundWave 0.8s ease-in-out 0.2s infinite alternate; }
+    .playing .bar-3 { animation: soundWave 0.8s ease-in-out 0.4s infinite alternate; }
+
+    @keyframes soundWave {
+      0% { transform: scaleY(0.2); }
+      100% { transform: scaleY(1); }
+    }
+
+    /* ==========================================================================
+       BOTTOM GLASS MUSIC PLAYER
+       ========================================================================== */
+    .player-wrapper {
+      width: 100%;
+      max-width: 680px;
+      z-index: 30;
+    }
+
+    .player-card {
+      background: rgba(20, 14, 11, 0.75);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 16px 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.3s ease;
+    }
+
+    /* Track Info Header */
+    .track-info-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .album-art-container {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #1e1b18;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .album-art {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .album-art-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #7c2d12, #451a03);
+      color: #f59e0b;
+    }
+
+    .track-meta {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex-grow: 1;
+    }
+
+    .track-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-artist {
+      font-size: 0.78rem;
+      color: rgba(255, 255, 255, 0.55);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    /* Custom Progress Bar */
+    .progress-section {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f59e0b, #ea580c);
+      border-radius: 4px;
+      transition: width 0.1s linear;
+    }
+
+    .time-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.45);
+      font-variant-numeric: tabular-nums;
+      font-weight: 500;
+    }
+
+    /* Player Controls */
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 2px;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+
+    .ctrl-btn:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .ctrl-btn:active {
+      transform: scale(0.92);
+    }
+
+    .ctrl-btn.active {
+      color: #f59e0b;
+    }
+
+    .play-btn {
+      width: 46px;
+      height: 46px;
+      background: #ffffff;
+      color: #0b0705;
+      border-radius: 50%;
+      box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    }
+
+    .play-btn:hover {
+      background: #f8fafc;
+      color: #000000;
+      transform: scale(1.05);
+    }
+
+    .play-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .secondary-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    /* Fallback Banner (In case Youtube embed restrictions trigger) */
+    .fallback-banner {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 12px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #fca5a5;
+    }
+
+    .fallback-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: #ef4444;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+
+    /* Hidden YouTube API container */
+    #yt-player-container {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+      bottom: 0;
+      right: 0;
+    }
+
+    /* ==========================================================================
+       RESPONSIVE ADJUSTMENTS (MOBILE FOCUS)
+       ========================================================================== */
+    @media (max-width: 480px) {
+      .player-card {
+        padding: 14px 16px;
+        border-radius: 20px;
+        gap: 10px;
+      }
+
+      .album-art-container {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+      }
+
+      .track-title {
+        font-size: 0.88rem;
+      }
+
+      .play-btn {
+        width: 42px;
+        height: 42px;
+      }
+
+      .ctrl-btn {
+        padding: 6px;
+      }
+
+      .brand-title {
+        letter-spacing: 0.04em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Elements -->
+  <div class="bg-container"></div>
+  <div class="bg-overlay"></div>
+
+  <!-- App Main Viewport -->
+  <div class="app-viewport">
+    
+    <!-- TOP BAR -->
+    <header class="top-bar">
+      <div class="top-left" id="clock-display">--:-- AM</div>
+      <div class="top-center">
+        <span class="live-dot">●</span>
+        <span>597 online</span>
+      </div>
+      <div class="top-right" title="Bhojpuri Work Session Radio">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2"/>
+          <path d="M16.24 7.76a6 6 0 0 1 0 8.49"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          <path d="M7.76 16.24a6 6 0 0 1 0-8.49"/>
+          <path d="M4.93 19.07a10 10 0 0 1 0-14.14"/>
+        </svg>
+      </div>
+    </header>
+
+    <!-- CENTER HERO -->
+    <main class="hero-container">
+      <h1 class="brand-title">ARKESTA</h1>
+      <p class="tagline-hindi">काम भी चलेगा, भोजपुरी भी बजेगा.</p>
+      <p class="sub-tagline">DESI WORK SESSION</p>
+
+      <!-- Floating Pill -->
+      <div class="floating-pill" id="status-pill">
+        <div class="audio-wave-icon" id="audio-wave">
+          <span class="audio-wave-bar bar-1"></span>
+          <span class="audio-wave-bar bar-2"></span>
+          <span class="audio-wave-bar bar-3"></span>
+        </div>
+        <span id="status-text">भोजपुरी ऑन है</span>
+      </div>
+    </main>
+
+    <!-- BOTTOM MUSIC PLAYER -->
+    <footer class="player-wrapper">
+      <div class="player-card">
+
+        <!-- Fallback Banner (Hidden by default) -->
+        <div class="fallback-banner" id="fallback-banner">
+          <span>YouTube API error or playback restricted in browser embed.</span>
+          <a class="fallback-btn" href="https://music.youtube.com/playlist?list=RDCLAK5uy_nlUHwf0SaQlGN6n_1ZtWhhplysMPwjP2k" target="_blank" rel="noopener">
+            Open ARKESTA Playlist on YouTube Music ↗
+          </a>
+        </div>
+        
+        <!-- Track Info -->
+        <div class="track-info-row">
+          <div class="album-art-container">
+            <img id="album-art" class="album-art" src="" alt="Album Art" style="display: none;">
+            <div id="album-art-fallback" class="album-art-placeholder">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+              </svg>
+            </div>
+          </div>
+          <div class="track-meta">
+            <div class="track-title" id="track-title">Press Play to Start</div>
+            <div class="track-artist" id="track-artist">Bhojpuri Desi Work Session</div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-section">
+          <div class="progress-bar-container" id="progress-container">
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+          </div>
+          <div class="time-labels">
+            <span id="time-current">0:00</span>
+            <span id="time-total">0:00</span>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-row">
+          <!-- Shuffle Button -->
+          <button class="ctrl-btn secondary-btn" id="shuffle-btn" title="Shuffle">
+            <svg viewBox="0 0 24 24">
+              <path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.45 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/>
+            </svg>
+          </button>
+
+          <!-- Previous Button -->
+          <button class="ctrl-btn secondary-btn" id="prev-btn" title="Previous">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+            </svg>
+          </button>
+
+          <!-- Main Play/Pause Button -->
+          <button class="ctrl-btn play-btn" id="play-btn" title="Play">
+            <svg id="play-icon" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </button>
+
+          <!-- Next Button -->
+          <button class="ctrl-btn secondary-btn" id="next-btn" title="Next">
+            <svg viewBox="0 0 24 24">
+              <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+            </svg>
+          </button>
+
+          <!-- Queue / YT Link Button -->
+          <button class="ctrl-btn secondary-btn" id="queue-btn" title="Open YouTube Music Playlist">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h11v2H4zm14 0v6l5-3z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Hidden YouTube Player Container -->
+  <div id="yt-player-container">
+    <div id="yt-player"></div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // ==========================================================================
+    // CONFIG & STATE MANAGEMENT
+    // ==========================================================================
+    const PLAYLIST_ID = 'RDCLAK5uy_nlUHwf0SaQlGN6n_1ZtWhhplysMPwjP2k';
+    
+    let ytPlayer = null;
+    let isApiReady = false;
+    let isPlaying = false;
+    let isShuffle = false;
+    let progressTimer = null;
+
+    // DOM Elements
+    const playBtn = document.getElementById('play-btn');
+    const playIcon = document.getElementById('play-icon');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const queueBtn = document.getElementById('queue-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressFill = document.getElementById('progress-fill');
+    const timeCurrent = document.getElementById('time-current');
+    const timeTotal = document.getElementById('time-total');
+    const trackTitle = document.getElementById('track-title');
+    const trackArtist = document.getElementById('track-artist');
+    const albumArt = document.getElementById('album-art');
+    const albumArtFallback = document.getElementById('album-art-fallback');
+    const statusText = document.getElementById('status-text');
+    const audioWave = document.getElementById('audio-wave');
+    const clockDisplay = document.getElementById('clock-display');
+    const fallbackBanner = document.getElementById('fallback-banner');
+
+    // ==========================================================================
+    // CLOCK LOGIC
+    // ==========================================================================
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12;
+      clockDisplay.textContent = `${hours}:${minutes} ${ampm}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // ==========================================================================
+    // YOUTUBE IFRAME PLAYER API INTEGRATION
+    // ==========================================================================
+    // Dynamically load YouTube IFrame API
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // YT API Callback when ready
+    window.onYouTubeIframeAPIReady = function() {
+      ytPlayer = new YT.Player('yt-player', {
+        height: '100',
+        width: '100',
+        playerVars: {
+          'listType': 'playlist',
+          'list': PLAYLIST_ID,
+          'autoplay': 0,
+          'controls': 0,
+          'disablekb': 1,
+          'fs': 0,
+          'rel': 0,
+          'modestbranding': 1,
+          'playsinline': 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError': onPlayerError
+        }
+      });
+    };
+
+    function onPlayerReady(event) {
+      isApiReady = true;
+      trackTitle.textContent = "ARKESTA Bhojpuri Playlist";
+      trackArtist.textContent = "Click play to begin work session";
+    }
+
+    function onPlayerStateChange(event) {
+      // YT.PlayerState: PLAYING (1), PAUSED (2), BUFFERING (3), ENDED (0), CUED (5)
+      switch (event.data) {
+        case YT.PlayerState.PLAYING:
+          setPlayingUI(true);
+          statusText.textContent = "भोजपुरी ऑन है";
+          updateTrackInformation();
+          startProgressTracking();
+          break;
+
+        case YT.PlayerState.PAUSED:
+          setPlayingUI(false);
+          statusText.textContent = "पॉज़्ड है (Paused)";
+          stopProgressTracking();
+          break;
+
+        case YT.PlayerState.BUFFERING:
+          statusText.textContent = "ट्यून हो रहा है...";
+          trackArtist.textContent = "Tuning in...";
+          break;
+
+        case YT.PlayerState.ENDED:
+          setPlayingUI(false);
+          if (ytPlayer && ytPlayer.nextVideo) {
+            ytPlayer.nextVideo();
+          }
+          break;
+      }
+    }
+
+    function onPlayerError(event) {
+      console.warn("YouTube Player error:", event.data);
+      // Show fallback UI clean link
+      if (fallbackBanner) {
+        fallbackBanner.style.display = 'flex';
+      }
+    }
+
+    // ==========================================================================
+    // PLAYER CONTROLS & LOGIC
+    // ==========================================================================
+    function togglePlay() {
+      if (!isApiReady || !ytPlayer) {
+        return;
+      }
+
+      if (isPlaying) {
+        ytPlayer.pauseVideo();
+      } else {
+        ytPlayer.playVideo();
+      }
+    }
+
+    function setPlayingUI(playing) {
+      isPlaying = playing;
+      if (playing) {
+        // Pause Icon
+        playIcon.innerHTML = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        audioWave.classList.add('playing');
+      } else {
+        // Play Icon
+        playIcon.innerHTML = `<path d="M8 5v14l11-7z"/>`;
+        audioWave.classList.remove('playing');
+      }
+    }
+
+    function updateTrackInformation() {
+      if (!ytPlayer || typeof ytPlayer.getVideoData !== 'function') return;
+
+      try {
+        const data = ytPlayer.getVideoData();
+        if (data && data.title) {
+          trackTitle.textContent = data.title;
+          trackArtist.textContent = data.author || "Bhojpuri Work Session";
+          
+          if (data.video_id) {
+            const thumbnailUrl = `https://img.youtube.com/vi/${data.video_id}/hqdefault.jpg`;
+            albumArt.src = thumbnailUrl;
+            albumArt.style.display = 'block';
+            albumArtFallback.style.display = 'none';
+          }
+        }
+      } catch (e) {
+        console.error("Error reading video details:", e);
+      }
+    }
+
+    function startProgressTracking() {
+      stopProgressTracking();
+      progressTimer = setInterval(() => {
+        if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+
+        const current = ytPlayer.getCurrentTime() || 0;
+        const total = ytPlayer.getDuration() || 0;
+
+        timeCurrent.textContent = formatTime(current);
+        timeTotal.textContent = formatTime(total);
+
+        if (total > 0) {
+          const pct = (current / total) * 100;
+          progressFill.style.width = `${pct}%`;
+        }
+
+        // Periodically refresh metadata if track changes automatically
+        updateTrackInformation();
+      }, 500);
+    }
+
+    function stopProgressTracking() {
+      if (progressTimer) clearInterval(progressTimer);
+    }
+
+    function formatTime(seconds) {
+      const min = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    function seekTrack(e) {
+      if (!ytPlayer || typeof ytPlayer.getDuration !== 'function') return;
+
+      const rect = progressContainer.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const width = rect.width;
+      const duration = ytPlayer.getDuration();
+
+      if (duration > 0) {
+        const targetTime = (clickX / width) * duration;
+        ytPlayer.seekTo(targetTime, true);
+        progressFill.style.width = `${(clickX / width) * 100}%`;
+      }
+    }
+
+    // ==========================================================================
+    // EVENT LISTENERS
+    // ==========================================================================
+    playBtn.addEventListener('click', togglePlay);
+
+    prevBtn.addEventListener('click', () => {
+      if (ytPlayer && ytPlayer.previousVideo) {
+        ytPlayer.previousVideo();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (ytPlayer && ytPlayer.nextVideo) {
+        ytPlayer.nextVideo();
+      }
+    });
+
+    shuffleBtn.addEventListener('click', () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.classList.toggle('active', isShuffle);
+      if (ytPlayer && ytPlayer.setShuffle) {
+        ytPlayer.setShuffle(isShuffle);
+      }
+    });
+
+    queueBtn.addEventListener('click', () => {
+      window.open(`https://music.youtube.com/playlist?list=${PLAYLIST_ID}`, '_blank');
+    });
+
+    progressContainer.addEventListener('click', seekTrack);
+
+    // Keyboard Spacebar play/pause
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        const activeTag = document.activeElement.tagName.toLowerCase();
+        if (activeTag !== 'input' && activeTag !== 'textarea') {
+          e.preventDefault();
+          togglePlay();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
